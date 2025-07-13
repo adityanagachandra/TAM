@@ -1,7 +1,7 @@
 # Token Activation Map to Visually Explain Multimodal LLMs
 We introduce the Token Activation Map (TAM), a groundbreaking method that cuts through the contextual noise in Multimodal LLMs. This technique produces exceptionally clear and reliable visualizations, revealing the precise visual evidence behind every word the model generates.
 
-[![arXiv](https://img.shields.io/badge/arXiv-2333.2333-brown?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2333.2333)
+[![arXiv](https://img.shields.io/badge/arXiv-2506.23270-brown?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2506.23270)
 
 
 ![Overview](imgs/overview.jpg)
@@ -27,7 +27,7 @@ Note: The demo supports both image and video inputs; update the inputs according
 
 
 ### Eval
-* Download the formatted datasets for eval at [[COCO14+GranDf+OpenPSG](https://hkustconnect-my.sharepoint.com/:u:/g/personal/ylini_connect_ust_hk/EXL-stkCxk5DnwRkNw9MgSABu1vFPv_0FI60yxl0OYxSGQ?e=V3qjHh)]
+* Download the formatted datasets for eval at [[COCO14+GranDf+OpenPSG](https://hkustconnect-my.sharepoint.com/:u:/g/personal/ylini_connect_ust_hk/EXL-stkCxk5DnwRkNw9MgSABu1vFPv_0FI60yxl0OYxSGQ?e=V3qjHh)] or [huggingface](https://huggingface.co/datasets/yili7eli/TAM/tree/main).
 * Evaluation for quantitative results
 ```
 # python eval.py [model_name] [dataset_path] [vis_path (visualize if given)]
@@ -100,5 +100,14 @@ This project is licensed under the MIT License.
 
 ## Citation
 ```
-# on going
+@misc{li2025tokenactivationmapvisually,
+      title={Token Activation Map to Visually Explain Multimodal LLMs}, 
+      author={Yi Li and Hualiang Wang and Xinpeng Ding and Haonan Wang and Xiaomeng Li},
+      year={2025},
+      eprint={2506.23270},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2506.23270}, 
+}
 ```
+
