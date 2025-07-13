@@ -303,16 +303,24 @@ def multimodal_process(raw_img, vision_shape, img_scores, txt_scores, txts, cand
         if eval_only:
             return None, img_map
 
-        # text vis via latex
-        txt_map = vis_text(txts, txt_scores, candidates, candi_scores, vis_token_idx, path=img_save_fn, font=r'{5pt}{6pt}')
-        if not isinstance(txt_map, np.ndarray): # latex vis failure
-            return None, img_map
-
-        # multimodal vis
         out_img = [img_map[i] * 0.5 + resized_img[i] * 0.5 for i in range(len(vision_shape))]
         out_img = np.concatenate(out_img, 1)
+
+        # text vis via latex
+        try:
+            txt_map = vis_text(txts, txt_scores, candidates, candi_scores, vis_token_idx, path=img_save_fn, font=r'{5pt}{6pt}')
+        except:
+            print('Skip text visualization, please check the installation of texlive-xetex.')
+            return out_img, img_map
+        
+        if not isinstance(txt_map, np.ndarray):
+            print('Skip txt visualization, please check weather the text special character compatible with LaTeX.')
+            return out_img, img_map
+
+        # concat multimodal vis
         txt_map = cv2.resize(txt_map, (out_img.shape[1], int(float(txt_map.shape[0]) / float(txt_map.shape[1]) * out_img.shape[1])))
         out_img = np.concatenate([out_img, txt_map], 0)
+
         return out_img, img_map
 
     # single img
@@ -333,17 +341,24 @@ def multimodal_process(raw_img, vision_shape, img_scores, txt_scores, txts, cand
 
         img_map = cv2.applyColorMap(img_scores, cv2.COLORMAP_JET)
         img_map = cv2.resize(img_map, (w, h))
-
-        # vis text via latex
-        txt_map = vis_text(txts, txt_scores, candidates, candi_scores, vis_token_idx, path=img_save_fn)
-        if not isinstance(txt_map, np.ndarray): # latex vis failure
-            return None, img_scores
-
-        txt_map = cv2.resize(txt_map, (w, int(float(txt_map.shape[0]) / float(txt_map.shape[1]) * w)))
         if vis_width > 0:
             raw_img = cv2.resize(raw_img, (w, h))
+        out_img = img_map * 0.5 + raw_img * 0.5
 
-        out_img = np.concatenate([img_map * 0.5 + raw_img * 0.5, txt_map], 0)
+        # vis text via latex
+        try:
+            txt_map = vis_text(txts, txt_scores, candidates, candi_scores, vis_token_idx, path=img_save_fn)
+        except:
+            print('Skip text visualization, please check the installation of texlive-xetex.')
+            return out_img, img_scores
+
+        if not isinstance(txt_map, np.ndarray):
+            print('Skip txt visualization, please check weather the text special character compatible with LaTeX.')
+            return out_img, img_scores
+
+        txt_map = cv2.resize(txt_map, (w, int(float(txt_map.shape[0]) / float(txt_map.shape[1]) * w)))
+        out_img = np.concatenate([out_img, txt_map], 0)
+
         return out_img, img_scores
 
     # video
@@ -361,18 +376,23 @@ def multimodal_process(raw_img, vision_shape, img_scores, txt_scores, txts, cand
             return None, img_scores
 
         img_map = [cv2.resize(cv2.applyColorMap(_, cv2.COLORMAP_JET), (w, h)) for _ in img_scores]
-
-        txt_map = vis_text(txts, txt_scores, candidates, candi_scores, vis_token_idx, path=img_save_fn, font=r'{5pt}{6pt}')
-        if not isinstance(txt_map, np.ndarray): # latex vis failure
-            return None, img_scores
-
-        txt_map = cv2.resize(txt_map, (int(w * b), int(float(txt_map.shape[0]) / float(txt_map.shape[1]) * w * b)))
         if vis_width > 0:
             raw_img = [cv2.resize(_, (w, h)) for _ in raw_img]
-
-        # combine multiple frames
         out_img = [img_map[i] * 0.5 + raw_img[i] * 0.5 for i in range(b)]
         out_img = np.concatenate(out_img, 1)
+
+        # vis text via latex
+        try:
+            txt_map = vis_text(txts, txt_scores, candidates, candi_scores, vis_token_idx, path=img_save_fn, font=r'{5pt}{6pt}')
+        except:
+            print('Skip text visualization, please check the installation of texlive-xetex.')
+            return out_img, img_scores
+
+        if not isinstance(txt_map, np.ndarray):
+            print('Skip txt visualization, please check weather the text special character compatible with LaTeX.')
+            return out_img, img_scores
+
+        txt_map = cv2.resize(txt_map, (int(w * b), int(float(txt_map.shape[0]) / float(txt_map.shape[1]) * w * b)))
         out_img = np.concatenate([out_img, txt_map], 0)
 
         return out_img, img_scores

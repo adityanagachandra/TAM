@@ -13,10 +13,10 @@ def tam_demo_for_qwen2_vl(image_path, prompt_text, save_dir='vis_results'):
     processor = AutoProcessor.from_pretrained(model_name)
 
     # Prepare input message with image/video and prompt
-    if isinstance(img, list):
-        messages = [{"role": "user", "content": [{"type": "video", "video": img}, {"type": "text", "text": prompt}]}]
+    if isinstance(image_path, list):
+        messages = [{"role": "user", "content": [{"type": "video", "video": image_path}, {"type": "text", "text": prompt}]}]
     else:
-        messages = [{"role": "user", "content": [{"type": "image", "image": img}, {"type": "text", "text": prompt}]}]
+        messages = [{"role": "user", "content": [{"type": "image", "image": image_path}, {"type": "text", "text": prompt}]}]
 
     # Process input text and visual info
     text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
@@ -48,13 +48,13 @@ def tam_demo_for_qwen2_vl(image_path, prompt_text, save_dir='vis_results'):
                    'answer_id': [[198, 151644, 77091, 198], -1]}
 
     # get shape of vision output
-    if isinstance(img, list):
+    if isinstance(image_path, list):
         vision_shape = (inputs['video_grid_thw'][0, 0], inputs['video_grid_thw'][0, 1] // 2, inputs['video_grid_thw'][0, 2] // 2)
     else:
         vision_shape = (inputs['image_grid_thw'][0, 1] // 2, inputs['image_grid_thw'][0, 2] // 2)
 
     # get img or video inputs for next vis
-    vis_inputs = [[video_inputs[0][i] for i in range(0, len(video_inputs[0]))]] if isinstance(img, list) else image_inputs
+    vis_inputs = [[video_inputs[0][i] for i in range(0, len(video_inputs[0]))]] if isinstance(image_path, list) else image_inputs
 
     # === TAM Visualization ===
     # Call TAM() to generate token activation map for each generation round
@@ -86,6 +86,15 @@ def tam_demo_for_qwen2_vl(image_path, prompt_text, save_dir='vis_results'):
 
 
 if __name__ == "__main__":
+    # single img demo
     img = "imgs/demo.jpg"
     prompt = "Describe this image."
-    tam_demo_for_qwen2_vl(img, prompt, save_dir='imgs/vis_demo')
+    tam_demo_for_qwen2_vl(img, prompt, save_dir='imgs/vis_img')
+
+    # video demo
+    imgs = []
+    for i in range(10):
+        # QWen merges next frames, repeating to vis each frame
+        imgs.extend(["imgs/frames/%s.jpg" % (str(i).zfill(4))] * 2)
+    prompt = "Describe this video."
+    tam_demo_for_qwen2_vl(imgs, prompt, save_dir='imgs/vis_video')
