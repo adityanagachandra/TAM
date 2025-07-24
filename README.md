@@ -1,5 +1,5 @@
 # Token Activation Map to Visually Explain Multimodal LLMs
-We introduce the Token Activation Map (TAM), a groundbreaking method that cuts through the contextual noise in Multimodal LLMs. This technique produces exceptionally clear and reliable visualizations, revealing the precise visual evidence behind every word the model generates.
+[ICCV 2025 Oral] We introduce the Token Activation Map (TAM), a groundbreaking method that cuts through the contextual noise in Multimodal LLMs. This technique produces exceptionally clear and reliable visualizations, revealing the precise visual evidence behind every word the model generates.
 
 [![arXiv](https://img.shields.io/badge/arXiv-2506.23270-brown?logo=arxiv&style=flat-square)](https://arxiv.org/abs/2506.23270)
 
