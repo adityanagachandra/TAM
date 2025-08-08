@@ -1,6 +1,8 @@
 import os
-from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
+import torch
+from transformers import Qwen2VLForConditionalGeneration, AutoProcessor, AutoModelForImageTextToText
 from qwen_utils import process_vision_info
+from PIL import Image
 from tam import TAM
 
 
@@ -34,7 +36,6 @@ def tam_demo_for_qwen2_vl(image_path, prompt_text, save_dir='vis_results'):
     )
 
     generated_ids = outputs.sequences
-    generated_ids_trimmed = [out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)]
 
     # === TAM code part ====
 
@@ -85,13 +86,62 @@ def tam_demo_for_qwen2_vl(image_path, prompt_text, save_dir='vis_results'):
             False)
 
 
+# InternVL2_5 uses its independent code, here I vis InternVL3 from the official transformers.
+def tam_demo_for_internvl3(image_path, prompt_text, save_dir='vis_results'):
+    torch_device = "cuda"
+    model_checkpoint = "OpenGVLab/InternVL3-1B-hf"
+    processor = AutoProcessor.from_pretrained(model_checkpoint)
+    model = AutoModelForImageTextToText.from_pretrained(model_checkpoint, device_map=torch_device, torch_dtype=torch.bfloat16)
+    
+    # Fixed size, if you want to use dymamic reso, please map crops to raw size.
+    image = Image.open(img)
+    image = image.resize((448, 448))
+    conversation = [{"role":"user", "content":[{"type":"image",}, {"type":"text", "text":"%s" % (prompt)}]}]
+    text_prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
+    inputs = processor(text=[text_prompt], images=[image], padding=True, return_tensors="pt")
+    inputs = inputs.to(model.device).to(model.dtype)
+
+    outputs = model.generate(**inputs, max_new_tokens=256, output_hidden_states=True, return_dict_in_generate=True)
+    generated_ids = outputs.sequences
+
+    # === TAM code part ====
+
+    # Compute logits from last hidden states with vocab classifier for TAM
+    logits = [model.lm_head(feats[-1]) for feats in outputs.hidden_states]
+
+    # InternVL has different special ids, please vis inputs['input_ids'] for special ids
+    special_ids = {'img_id': [151665, 151666],
+                   'prompt_id': [[151666, 198], [151645, 198, 151644, 77091]], 
+                   'answer_id': [[198, 151644, 77091, 198], -1]}
+
+    vision_shape = (16, 16)
+    vis_inputs = image
+    
+    raw_map_records = []
+    for i in range(len(logits)):
+        img_map = TAM(
+            generated_ids[0].cpu().tolist(),
+            vision_shape,
+            logits,
+            special_ids,
+            vis_inputs,
+            processor,
+            os.path.join(save_dir, str(i) + '.jpg'),
+            i,
+            raw_map_records,
+            False)
+
+
 if __name__ == "__main__":
-    # single img demo
+    # single img demo (qwen)
     img = "imgs/demo.jpg"
     prompt = "Describe this image."
     tam_demo_for_qwen2_vl(img, prompt, save_dir='imgs/vis_img')
 
-    # video demo
+    # single img demo (internvl)
+    tam_demo_for_internvl3(img, prompt, save_dir='imgs/vis_img_internvl')
+
+    # video demo (qwen)
     imgs = []
     for i in range(10):
         # QWen merges next frames, repeating to vis each frame
