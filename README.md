@@ -9,83 +9,45 @@
 
 ## Installation
 
-### Prerequisites
-- Python 3.9+
-- CUDA-compatible GPU (recommended for model inference)
-- Git
+### Quick Setup (Choose One)
 
-### Environment Setup
+#### Option 1: Automated Setup (Recommended)
+```bash
+git clone https://github.com/adityanagachandra/TAM.git
+cd TAM
+./setup_conda_env.sh
+```
 
-1. **Create Conda Environment**
-   ```bash
-   # Create a new conda environment with Python 3.9
-   conda create -n TAM python=3.9 -y
-   
-   # Activate the environment
-   conda activate TAM
-   ```
+#### Option 2: Manual Setup
+```bash
+git clone https://github.com/adityanagachandra/TAM.git
+cd TAM
+conda create -n TAM python=3.9 -y
+conda activate TAM
+pip install -r requirements.txt
+```
 
-2. **Install Python Dependencies**
-   ```bash
-   # Install base requirements
-   pip install -r requirements.txt
-   
-   # Install additional required packages that were discovered during setup
-   pip install opencv-python accelerate
-   
-   # Note: The 'fitz' package in requirements.txt conflicts with PyMuPDF
-   # If you encounter issues, uninstall it as PyMuPDF provides the needed fitz module
-   pip uninstall fitz -y
-   ```
+### Detailed Installation
 
-3. **Complete Requirements List**
-   
-   The following packages are required (automatically installed via requirements.txt and additional installs):
-   - `transformers==4.52.1` - Hugging Face transformers library
-   - `pymupdf` - PDF processing (provides fitz module)
-   - `nltk` - Natural language toolkit
-   - `rouge` - ROUGE evaluation metrics
-   - `matplotlib` - Plotting and visualization
-   - `pathlib` - Path handling utilities
-   - `scipy` - Scientific computing
-   - `numpy` - Numerical computing
-   - `opencv-python` - Computer vision library (cv2)
-   - `accelerate` - Hugging Face acceleration library for model loading
-   
-   **Note**: Do NOT install the standalone `fitz` package as it conflicts with PyMuPDF.
+For complete installation instructions, troubleshooting, and platform-specific guides, see **[INSTALL.md](INSTALL.md)**.
 
-4. **LaTeX for Text Visualization (Optional, for Linux/Ubuntu)**
-   ```bash
-   sudo apt-get update
-   sudo apt-get install texlive-xetex
-   ```
-   
-   **For macOS users**: Install MacTeX or BasicTeX:
-   ```bash
-   # Using Homebrew
-   brew install --cask mactex
-   # OR for smaller installation
-   brew install --cask basictex
-   ```
+### Quick Verification
 
-### Quick Start
+```bash
+conda activate TAM
+python -c "import torch, cv2, transformers, fitz; print('✅ Installation successful!')"
+python demo.py  # Run demo (downloads ~4GB model on first run)
+```
 
-1. **Clone and Setup**
-   ```bash
-   git clone https://github.com/adityanagachandra/TAM.git
-   cd TAM
-   conda create -n TAM python=3.9 -y
-   conda activate TAM
-   pip install -r requirements.txt
-   pip install opencv-python accelerate
-   ```
+### Requirements Summary
 
-2. **Run Demo**
-   ```bash
-   python demo.py
-   ```
-   
-   **Note**: The demo will download the Qwen2-VL-2B-Instruct model (~4GB) on first run. Ensure you have sufficient disk space and a stable internet connection.
+All dependencies are in [requirements.txt](requirements.txt):
+- **Core**: `transformers==4.52.1`, `torch`, `accelerate`
+- **Vision**: `opencv-python`, `pillow` 
+- **Processing**: `pymupdf` (provides `fitz`), `numpy`, `scipy`
+- **Utils**: `matplotlib`, `nltk`, `rouge`, `tqdm`
+
+**⚠️ Important**: Do NOT install the standalone `fitz` package - PyMuPDF provides the correct one.
 
 ## Usage
 
