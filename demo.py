@@ -1,4 +1,4 @@
-import os
+pimport os
 import torch
 from transformers import Qwen2VLForConditionalGeneration, AutoProcessor, AutoModelForImageTextToText
 from qwen_utils import process_vision_info

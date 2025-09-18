@@ -1,0 +1,48 @@
+{
+  "task_id": "tam",
+  "name": "Token Activation Map (TAM) Visual Explanation",
+  "prompt": "prompt.md",
+  "description": "Use Token Activation Map (TAM) to visually explain multimodal LLM outputs on COCO images. Generate visual explanations showing which image regions correspond to each generated token.",
+  "difficulty": "hard",
+  "category": "computer_vision",
+  "input_files": [
+    "image/000000121031.jpg",
+    "image/000000121506.jpg", 
+    "image/000000185250.jpg",
+    "image/000000186980.jpg",
+    "image/000000223747.jpg",
+    "image/000000231747.jpg",
+    "image/000000239347.jpg",
+    "image/000000383384.jpg",
+    "image/000000453708.jpg",
+    "image/000000559956.jpg"
+  ],
+  "expected_outputs": {
+    "solution_file": "tam_results.json",
+    "format": "json",
+    "sample": {
+      "results": [
+        {
+          "image": "000000121031.jpg",
+          "description": "Generated description of the image",
+          "token_activations": [
+            {
+              "token": "cat",
+              "activation_map": "path/to/activation_map.jpg"
+            }
+          ],
+          "metrics": {
+            "iou": 0.85,
+            "f1_score": 0.90
+          }
+        }
+      ]
+    }
+  },
+  "evaluation_criteria": {
+    "min_iou": 0.5,
+    "min_f1_score": 0.6,
+    "require_all_images": true
+  },
+  "timeout_seconds": 3000
+}
